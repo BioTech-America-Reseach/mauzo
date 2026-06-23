@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Jawiza">
 <meta name="theme-color" content="#D4A24E">
-<title>Jawiza — Complete AI Assistant</title>
+<title>Jawiza — Ultimate Business Assistant</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -33,6 +33,8 @@
     --blue-soft: rgba(74,158,255,0.14);
     --orange:#f39c12;
     --orange-soft: rgba(243,156,18,0.14);
+    --purple:#9b59b6;
+    --purple-soft: rgba(155,89,182,0.14);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -256,6 +258,8 @@
   .btn-blue:hover{ opacity:0.85; }
   .btn-orange{ background:var(--orange); color:#fff; }
   .btn-orange:hover{ opacity:0.85; }
+  .btn-purple{ background:var(--purple); color:#fff; }
+  .btn-purple:hover{ opacity:0.85; }
 
   .field{ margin-bottom:14px; }
   .field label{ display:block; font-size:12px; color:var(--text-dim); margin-bottom:6px; font-weight:500; }
@@ -503,6 +507,30 @@
   .reminder-alarm .time{ font-size:11px; color:var(--text-faint); font-family:'JetBrains Mono'; }
   .reminder-alarm .dismiss{ background:transparent; border:none; color:var(--text-faint); cursor:pointer; font-size:16px; }
   .reminder-alarm .dismiss:hover{ color:var(--red); }
+
+  /* Receipt Styles */
+  .receipt-paper{
+    background:#fff; color:#111; font-family:'JetBrains Mono', monospace; font-size:12px;
+    padding:20px; border-radius:6px; width:320px; margin:0 auto;
+  }
+  .receipt-paper .rp-logo{ text-align:center; font-family:'Space Grotesk'; font-weight:700; font-size:22px; color:#D4A24E; letter-spacing:1px; }
+  .receipt-paper .rp-sub{ text-align:center; font-size:10px; color:#555; margin-bottom:10px; }
+  .receipt-paper .rp-divider{ border:none; border-top:2px dashed #999; margin:6px 0; }
+  .receipt-paper .rp-row{ display:flex; justify-content:space-between; margin-bottom:3px; }
+  .receipt-paper .rp-total{ font-weight:700; font-size:16px; color:#D4A24E; }
+  .receipt-paper .rp-footer{ text-align:center; font-size:9px; color:#777; margin-top:8px; border-top:1px dashed #999; padding-top:8px; }
+  .receipt-paper .rp-clinic{ font-size:10px; color:#555; text-align:center; margin:4px 0; font-family:'Inter', sans-serif; }
+  .receipt-paper .rp-clinic strong{ color:#D4A24E; }
+
+  /* Download Button */
+  .download-app-btn{
+    display:flex; align-items:center; gap:6px;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim);
+    padding:8px 14px; border-radius:999px; font-size:13px; cursor:pointer;
+    font-family:'Inter'; font-weight:500; text-decoration:none;
+    transition:all .15s ease;
+  }
+  .download-app-btn:hover{ border-color:var(--gold); color:var(--text); }
 </style>
 </head>
 <body>
@@ -513,7 +541,7 @@
   <div class="topbar">
     <div class="brand">
       <div class="brand-mark">J</div>
-      <div><div class="brand-name">Jawiza</div><div class="brand-sub">Complete AI Assistant</div></div>
+      <div><div class="brand-name">Jawiza</div><div class="brand-sub">Ultimate Business Assistant</div></div>
     </div>
     <div class="topbar-right">
       <div class="save-bar"><span class="save-dot" id="saveDot"></span><span id="saveText">Imehifadhiwa</span></div>
@@ -522,6 +550,7 @@
         <span id="micLiveLabel">Live Mic</span>
         <span class="count" id="micLiveCount">0</span>
       </button>
+      <button class="download-app-btn" onclick="downloadApp()"><i class="fa-solid fa-download"></i> Pakua App</button>
       <div class="clock mono" id="clockDisplay">--:--:--</div>
     </div>
   </div>
@@ -533,7 +562,7 @@
     <div class="nav-tab" data-page="mauzo" onclick="showPage('mauzo')"><span class="dot"></span>Mauzo</div>
     <div class="nav-tab" data-page="matumizi" onclick="showPage('matumizi')"><span class="dot" style="background:var(--red);"></span>Matumizi</div>
     <div class="nav-tab" data-page="stock" onclick="showPage('stock')"><span class="dot"></span>Stoki</div>
-    <div class="nav-tab" data-page="malengo" onclick="showPage('malengo')"><span class="dot" style="background:var(--orange);"></span>📋 Ratiba & Malengo <span class="badge-reminder" id="navReminderBadge" style="display:none;">!</span></div>
+    <div class="nav-tab" data-page="malengo" onclick="showPage('malengo')"><span class="dot" style="background:var(--orange);"></span>📋 Ratiba <span class="badge-reminder" id="navReminderBadge" style="display:none;">!</span></div>
     <div class="nav-tab" data-page="alldata" onclick="showPage('alldata')"><span class="dot" style="background:var(--gold);"></span>Ripoti</div>
   </div>
 
@@ -546,17 +575,16 @@
           <div class="orb-core"><svg viewBox="0 0 24 24" fill="none"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z" stroke="#1a1305" stroke-width="1.8" fill="#1a1305"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3" stroke="#1a1305" stroke-width="1.8" stroke-linecap="round"/></svg></div>
         </div>
         <div class="orb-status" id="orbStatus">Bofya kuongea na Jawiza</div>
-        <div class="orb-hint">Sema chochote, AI inarekodi na kuchambua</div>
+        <div class="orb-hint">Sema "Uza [kiasi]" au "Matumizi [kiasi]"</div>
         <div class="typebar">
           <input type="text" id="commandInput" placeholder="Andika amri hapa...">
           <button onclick="submitTypedCommand()">Tuma</button>
         </div>
         <div class="chips-wrap">
           <div class="help-chip" onclick="toggleLiveMic()">🎤 Live Mic</div>
-          <div class="help-chip" onclick="triggerVoiceSale()">Seli</div>
-          <div class="help-chip" onclick="triggerVoiceExpense()">Matumizi</div>
+          <div class="help-chip" onclick="triggerQuickSale()">⚡ Mauzo</div>
+          <div class="help-chip" onclick="triggerQuickExpense()">💸 Matumizi</div>
           <div class="help-chip" onclick="triggerSavings()">💰 Akiba</div>
-          <div class="help-chip" onclick="showPage('malengo')">📋 Ratiba</div>
         </div>
         <div style="margin-top:14px;width:100%;">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--panel-2);border-radius:10px;border:1px solid var(--line);">
@@ -667,7 +695,7 @@
     </div>
   </div>
 
-  <!-- MALENGO - Ratiba & Malengo -->
+  <!-- MALENGO -->
   <div class="page" id="page-malengo">
     <div class="command-grid" style="grid-template-columns:1fr 1fr;">
       <div class="panel">
@@ -681,7 +709,7 @@
         <div id="scheduleList" style="display:flex;flex-direction:column;gap:10px;margin-top:16px;"></div>
         <div class="empty-state" id="scheduleEmpty" style="display:none;"><i class="fa-solid fa-list-check"></i><div>Hakuna kazi kwenye ratiba ya leo.</div></div>
         <div style="margin-top:12px;font-size:11px;color:var(--text-faint);">
-          <i class="fa-solid fa-bell"></i> Kumbusho kila dakika 15 kama kazi haijakamilika
+          <i class="fa-solid fa-bell"></i> Kumbusho kila dakika 15
         </div>
       </div>
       <div class="panel">
@@ -694,9 +722,6 @@
         </div>
         <div id="goalsList" style="display:flex;flex-direction:column;gap:10px;margin-top:16px;"></div>
         <div class="empty-state" id="goalsEmpty" style="display:none;"><i class="fa-solid fa-bullseye"></i><div>Hakuna malengo bado.</div></div>
-        <div style="margin-top:12px;font-size:11px;color:var(--text-faint);">
-          <i class="fa-solid fa-bell"></i> Kumbusho kulingana na frequency uliyochagua
-        </div>
       </div>
     </div>
   </div>
@@ -752,11 +777,9 @@
   </button>
 </div>
 
-<!-- ===== MODALS ===== -->
-
+<!-- MODALS -->
 <div class="modal-overlay" id="savingsModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3>💰 Weka Akiba</h3><button class="modal-close" onclick="closeModal('savingsModal')"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modal-box"><div class="modal-head"><h3>💰 Weka Akiba</h3><button class="modal-close" onclick="closeModal('savingsModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="field"><label>Kiasi (Tsh)</label><input type="number" id="savingsAmountInput" placeholder="0" min="0"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
       <button class="btn btn-ghost" onclick="closeModal('savingsModal')">Ghairi</button>
@@ -766,8 +789,7 @@
 </div>
 
 <div class="modal-overlay" id="newSaleModal">
-  <div class="modal-box wide">
-    <div class="modal-head"><h3>Mauzo Mapya</h3><button class="modal-close" onclick="closeModal('newSaleModal')"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modal-box wide"><div class="modal-head"><h3>Mauzo Mapya</h3><button class="modal-close" onclick="closeModal('newSaleModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="field"><label>Jina la Mteja</label><input type="text" id="saleCustomerName" placeholder="Juma Hassan"></div>
     <div id="saleItemsContainer"></div>
     <button class="btn btn-ghost btn-sm" onclick="addSaleItemRow()" style="margin-bottom:14px;"><i class="fa-solid fa-plus"></i> Ongeza Bidhaa</button>
@@ -783,8 +805,7 @@
 </div>
 
 <div class="modal-overlay" id="newExpenseModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3>Matumizi Mapya</h3><button class="modal-close" onclick="closeModal('newExpenseModal')"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modal-box"><div class="modal-head"><h3>Matumizi Mapya</h3><button class="modal-close" onclick="closeModal('newExpenseModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="field"><label>Maelezo</label><input type="text" id="expenseDesc" placeholder="mafuta ya gari"></div>
     <div class="field"><label>Kiasi (Tsh)</label><input type="number" id="expenseAmount" placeholder="0"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
@@ -795,8 +816,7 @@
 </div>
 
 <div class="modal-overlay" id="newStockModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3>Bidhaa Mpya</h3><button class="modal-close" onclick="closeModal('newStockModal')"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modal-box"><div class="modal-head"><h3>Bidhaa Mpya</h3><button class="modal-close" onclick="closeModal('newStockModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="field"><label>Jina la Bidhaa</label><input type="text" id="stockNewName" placeholder="sementi"></div>
     <div class="field-row">
       <div class="field"><label>Idadi</label><input type="number" id="stockNewQty" placeholder="0"></div>
@@ -810,8 +830,7 @@
 </div>
 
 <div class="modal-overlay" id="editStockModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3>✏️ Hariri Bidhaa</h3><button class="modal-close" onclick="closeModal('editStockModal')"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modal-box"><div class="modal-head"><h3>✏️ Hariri Bidhaa</h3><button class="modal-close" onclick="closeModal('editStockModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="field"><label>Jina la Bidhaa</label><input type="text" id="editStockName" readonly style="background:var(--panel);opacity:0.7;"></div>
     <div class="field-row">
       <div class="field"><label>Idadi</label><input type="number" id="editStockQty" min="0"></div>
@@ -825,8 +844,7 @@
 </div>
 
 <div class="modal-overlay" id="quickStockModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3><i class="fa-solid fa-triangle-exclamation" style="color:var(--red);"></i> Ongeza Bidhaa</h3><button class="modal-close" onclick="closeModal('quickStockModal')"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modal-box"><div class="modal-head"><h3><i class="fa-solid fa-triangle-exclamation" style="color:var(--red);"></i> Ongeza Bidhaa</h3><button class="modal-close" onclick="closeModal('quickStockModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <p style="color:var(--text-dim);font-size:13.5px;margin-bottom:14px;" id="quickStockMissingText"></p>
     <div class="field"><label>Jina la Bidhaa</label><input type="text" id="quickStockName" placeholder="samaki"></div>
     <div class="field-row">
@@ -841,8 +859,7 @@
 </div>
 
 <div class="modal-overlay" id="receiptModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3>Risiti</h3><button class="modal-close" onclick="closeModal('receiptModal')"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modal-box"><div class="modal-head"><h3>Risiti</h3><button class="modal-close" onclick="closeModal('receiptModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <div id="receiptPaperContainer"></div>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px;">
       <button class="btn btn-ghost" onclick="closeModal('receiptModal')">Funga</button>
@@ -853,23 +870,17 @@
 </div>
 
 <div class="modal-overlay" id="aiProcessModal">
-  <div class="modal-box wide">
-    <div class="modal-head">
-      <h3>🤖 AI Inachambua Mazungumzo</h3>
-      <button class="modal-close" onclick="closeModal('aiProcessModal')"><i class="fa-solid fa-xmark"></i></button>
-    </div>
+  <div class="modal-box wide"><div class="modal-head"><h3>🤖 AI Inachambua</h3><button class="modal-close" onclick="closeModal('aiProcessModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <div id="aiProcessContent"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;">
       <button class="btn btn-ghost" onclick="closeModal('aiProcessModal')">Funga</button>
-      <button class="btn btn-gold" onclick="confirmAIResults()"><i class="fa-solid fa-check"></i> Thibitisha Yote</button>
+      <button class="btn btn-gold" onclick="confirmAIResults()"><i class="fa-solid fa-check"></i> Thibitisha</button>
     </div>
   </div>
 </div>
 
-<!-- NEW SCHEDULE MODAL -->
 <div class="modal-overlay" id="newScheduleModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3>📋 Kazi Mpya</h3><button class="modal-close" onclick="closeModal('newScheduleModal')"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modal-box"><div class="modal-head"><h3>📋 Kazi Mpya</h3><button class="modal-close" onclick="closeModal('newScheduleModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="field"><label>Kazi</label><input type="text" id="schedTaskInput" placeholder="piga simu mzabuni"></div>
     <div class="field"><label>Muda (hiari)</label><input type="time" id="schedTimeInput"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
@@ -879,32 +890,30 @@
   </div>
 </div>
 
-<!-- NEW GOAL MODAL -->
 <div class="modal-overlay" id="newGoalModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3>🎯 Lengo Jipya</h3><button class="modal-close" onclick="closeModal('newGoalModal')"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modal-box"><div class="modal-head"><h3>🎯 Lengo Jipya</h3><button class="modal-close" onclick="closeModal('newGoalModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="field"><label>Lengo</label><input type="text" id="goalNameInput" placeholder="kujenga nyumba"></div>
-    <div class="field"><label>Tarehe ya Lengo (hiari)</label><input type="date" id="goalDeadlineInput"></div>
+    <div class="field"><label>Tarehe ya Lengo</label><input type="date" id="goalDeadlineInput"></div>
     <div class="field"><label>Ukumbusho</label><select id="goalReminderFreq"><option value="daily">Kila siku</option><option value="weekly">Kila wiki</option></select></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
       <button class="btn btn-ghost" onclick="closeModal('newGoalModal')">Ghairi</button>
-      <button class="btn btn-gold" onclick="confirmNewGoal()">Ongeza Lengo</button>
+      <button class="btn btn-gold" onclick="confirmNewGoal()">Ongeza</button>
     </div>
   </div>
 </div>
 
 <script>
 // ================================================================
-// COMPLETE SYSTEM
+// JAWIZA ULTIMATE - COMPLETE SYSTEM
 // ================================================================
 
 // ================================================================
 // CONSTANTS
 // ================================================================
-const STORAGE_KEY = 'jawiza_state_v7';
+const STORAGE_KEY = 'jawiza_ultimate_v1';
 const DELETED_KEY = 'jawiza_deleted_receipts';
-const CONVERSATION_KEY = 'jawiza_conversation_v3';
-const REMINDER_LOG_KEY = 'jawiza_reminder_log_v2';
+const CONVERSATION_KEY = 'jawiza_conversation_ultimate';
+const REMINDER_LOG_KEY = 'jawiza_reminder_log_ultimate';
 const LAST_BACKUP_KEY = 'jawiza_last_backup';
 
 // ================================================================
@@ -918,14 +927,14 @@ const MISTRAL_MODEL = 'mistral-large-latest';
 // ================================================================
 function defaultState() {
   return {
-    stocks: { 'chupa': { idadi: 20, bei: 3000 }, 'sementi': { idadi: 50, bei: 15000 } },
+    stocks: { 'chupa': { idadi: 20, bei: 3000, added: '2024-01-01' }, 'sementi': { idadi: 50, bei: 15000, added: '2024-01-01' } },
     sales: [],
     expenses: [],
     saleCounter: 1000,
     activityLog: [],
     schedule: [],
     goals: [],
-    settings: { shopName: 'Duka Langu', lang: 'sw' },
+    settings: { shopName: 'Dr William Clinic', tin: '186-938-394', phone: '255762286282', location: 'DSM - TANZANIA' },
     savings: [],
     shopOpenTime: null,
     shopCloseTime: null
@@ -936,7 +945,6 @@ let state = loadState();
 let conversation = [];
 let liveMicActive = false;
 let liveRecognition = null;
-let aiResults = [];
 let pendingSaleItems = [];
 let voiceFlowActive = false;
 let voiceFlowStep = null;
@@ -946,8 +954,8 @@ let currentLang = 'sw';
 let recognition = null;
 let isListening = false;
 let availableVoices = [];
-let reminderInterval = null;
 let editStockKey = null;
+let aiDetectedItems = [];
 
 // ================================================================
 // STORAGE
@@ -1073,29 +1081,16 @@ function openModal(id) {
   if (!modal) return;
   modal.classList.add('open');
   modal.style.display = 'flex';
-  
   if (id === 'newSaleModal') {
     pendingSaleItems = [{name: '', qty: 1}];
     document.getElementById('saleCustomerName').value = '';
     document.getElementById('salePaidStatus').value = 'paid';
     renderSaleItemRows();
   }
-  if (id === 'savingsModal') {
-    document.getElementById('savingsAmountInput').value = '';
-  }
-  if (id === 'newExpenseModal') {
-    document.getElementById('expenseDesc').value = '';
-    document.getElementById('expenseAmount').value = '';
-  }
-  if (id === 'newScheduleModal') {
-    document.getElementById('schedTaskInput').value = '';
-    document.getElementById('schedTimeInput').value = '';
-  }
-  if (id === 'newGoalModal') {
-    document.getElementById('goalNameInput').value = '';
-    document.getElementById('goalDeadlineInput').value = '';
-    document.getElementById('goalReminderFreq').value = 'daily';
-  }
+  if (id === 'savingsModal') document.getElementById('savingsAmountInput').value = '';
+  if (id === 'newExpenseModal') { document.getElementById('expenseDesc').value = ''; document.getElementById('expenseAmount').value = ''; }
+  if (id === 'newScheduleModal') { document.getElementById('schedTaskInput').value = ''; document.getElementById('schedTimeInput').value = ''; }
+  if (id === 'newGoalModal') { document.getElementById('goalNameInput').value = ''; document.getElementById('goalDeadlineInput').value = ''; document.getElementById('goalReminderFreq').value = 'daily'; }
 }
 
 function closeModal(id) {
@@ -1128,12 +1123,10 @@ function renderSavings() {
 function confirmSavings() {
   const amount = parseInt(document.getElementById('savingsAmountInput').value) || 0;
   if (amount <= 0) { showToast('Weka kiasi sahihi', 'warn'); return; }
-  
   const today = todayKey();
   const existing = state.savings.find(s=>s.date===today);
   if(existing) existing.amount += amount;
   else state.savings.push({date:today, amount:amount});
-  
   saveState();
   renderSavings();
   closeModal('savingsModal');
@@ -1237,16 +1230,18 @@ function saveEditStock() {
   renderStockTable();
   renderStats();
   closeModal('editStockModal');
+  logActivity('warn', 'Stoki imehaririwa: '+editStockKey+' - Qty:'+qty+' Bei:'+price);
   showToast('✅ ' + editStockKey + ' imehaririwa!', 'ok');
   editStockKey = null;
 }
 
 function deleteStockItem(key) {
-  if(!confirm('Kufuta '+key+' kabisa?')) return;
+  if(!confirm('Kufuta '+key+' kabisa? Hii itaathiri mauzo yaliyopo.')) return;
   delete state.stocks[key];
   saveState();
   renderStockTable();
   renderStats();
+  logActivity('warn', 'Bidhaa imefutwa: '+key);
   showToast('🗑️ ' + key + ' imefutwa', 'warn');
 }
 
@@ -1259,12 +1254,13 @@ function confirmNewStock() {
     state.stocks[name].idadi += qty; 
     if(price>0) state.stocks[name].bei = price; 
   } else { 
-    state.stocks[name] = {idadi:qty, bei:price}; 
+    state.stocks[name] = {idadi:qty, bei:price, added: todayKey()}; 
   }
   saveState();
   renderStockTable();
   renderStats();
   closeModal('newStockModal');
+  logActivity('ai', 'Bidhaa mpya imeongezwa: '+name+' ('+qty+')');
   showToast('✅ ' + name + ' imeongezwa stoki!', 'ok');
 }
 
@@ -1277,12 +1273,13 @@ function confirmQuickStock() {
     state.stocks[name].idadi += qty; 
     if(price>0) state.stocks[name].bei = price; 
   } else { 
-    state.stocks[name] = {idadi:qty, bei:price}; 
+    state.stocks[name] = {idadi:qty, bei:price, added: todayKey()}; 
   }
   saveState();
   renderStockTable();
   renderStats();
   closeModal('quickStockModal');
+  logActivity('ai', 'Bidhaa imeongezwa kwa haraka: '+name+' (+'+qty+')');
   showToast('✅ ' + name + ' imeongezwa stoki!', 'ok');
   speak(name + ' imeongezwa stoki.');
 }
@@ -1343,6 +1340,9 @@ function confirmNewExpense() {
   showToast('Matumizi yamehifadhiwa', 'ok');
 }
 
+// ================================================================
+// SALE ITEMS
+// ================================================================
 function renderSaleItemRows() {
   const container = document.getElementById('saleItemsContainer');
   const stockNames = Object.keys(state.stocks);
@@ -1435,7 +1435,7 @@ function recordSale(items, customerName, status) {
 }
 
 // ================================================================
-// RECEIPT
+// RECEIPT - PROFESSIONAL
 // ================================================================
 function viewReceipt(saleId) {
   const sale = state.sales.find(s=>s.id===saleId);
@@ -1445,20 +1445,23 @@ function viewReceipt(saleId) {
   const container = document.getElementById('receiptPaperContainer');
   const d = new Date(sale.dateISO);
   container.innerHTML = `
-    <div class="receipt-paper" id="receiptPaper" style="background:#fff;color:#111;font-family:'JetBrains Mono',monospace;font-size:12px;padding:20px;border-radius:6px;width:320px;margin:0 auto;">
-      <div style="text-align:center;font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#D4A24E;">${escapeHtml(state.settings.shopName)}</div>
-      <div style="text-align:center;font-size:10px;color:#555;margin-bottom:10px;">Risiti ya Mauzo</div>
-      <hr style="border:none;border-top:1px dashed #999;margin:6px 0;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Na. Risiti</span><span>#${sale.seriesNo}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Tarehe</span><span>${d.toLocaleDateString('en-GB')} ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Mteja</span><span>${escapeHtml(sale.customerName||'-')}</span></div>
-      <hr style="border:none;border-top:1px dashed #999;margin:6px 0;">
-      ${sale.items.map(i=>`<div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>${escapeHtml(i.name)} x${i.qty}</span><span>Tsh ${fmtMoney(i.price*i.qty)}</span></div>`).join('')}
-      <hr style="border:none;border-top:1px dashed #999;margin:6px 0;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:2px;font-weight:700;font-size:15px;color:#D4A24E;"><span>JUMLA</span><span>Tsh ${fmtMoney(sale.total)}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Hali</span><span style="font-weight:700;">${sale.status==='paid'?'IMELIPIWA':'HAIJALIPIWA'}</span></div>
-      <hr style="border:none;border-top:1px dashed #999;margin:6px 0;">
-      <div style="text-align:center;font-size:9px;color:#777;margin-top:8px;">Asante kwa kununua nasi</div>
+    <div class="receipt-paper" id="receiptPaper">
+      <div class="rp-logo">${escapeHtml(state.settings.shopName)}</div>
+      <div class="rp-clinic"><strong>Tell:</strong> ${escapeHtml(state.settings.phone)} | <strong>TIN:</strong> ${escapeHtml(state.settings.tin)}</div>
+      <div class="rp-clinic">${escapeHtml(state.settings.location)}</div>
+      <div class="rp-sub">Risiti ya Mauzo</div>
+      <hr class="rp-divider">
+      <div class="rp-row"><span>Na. Risiti</span><span>#${sale.seriesNo}</span></div>
+      <div class="rp-row"><span>Tarehe</span><span>${d.toLocaleDateString('en-GB')} ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</span></div>
+      <div class="rp-row"><span>Mteja</span><span>${escapeHtml(sale.customerName||'-')}</span></div>
+      <hr class="rp-divider">
+      ${sale.items.map(i=>`<div class="rp-row"><span>${escapeHtml(i.name)} x${i.qty}</span><span>Tsh ${fmtMoney(i.price*i.qty)}</span></div>`).join('')}
+      <hr class="rp-divider">
+      <div class="rp-row rp-total"><span>JUMLA</span><span>Tsh ${fmtMoney(sale.total)}</span></div>
+      <div class="rp-row"><span>Hali</span><span style="font-weight:700;">${sale.status==='paid'?'IMELIPIWA':'HAIJALIPIWA'}</span></div>
+      <hr class="rp-divider">
+      <div class="rp-footer">Asante kwa kununua nasi</div>
+      <div class="rp-footer" style="font-size:8px;color:#aaa;">Generated by Jawiza</div>
     </div>
   `;
   openModal('receiptModal');
@@ -1495,7 +1498,24 @@ function printReceiptPNG() {
 }
 
 // ================================================================
-// SCHEDULE & GOALS - WITH REMINDERS
+// QUICK VOICE SALES
+// ================================================================
+function triggerQuickSale() {
+  voiceFlowActive = true;
+  voiceFlowStep = 'quick_sale';
+  voiceFlowData = {};
+  speak('Sema kiasi cha mauzo, kwa mfano "Uza 5000"');
+}
+
+function triggerQuickExpense() {
+  voiceFlowActive = true;
+  voiceFlowStep = 'quick_expense';
+  voiceFlowData = {};
+  speak('Sema matumizi, kwa mfano "Matumizi 3000 ya chumvi"');
+}
+
+// ================================================================
+// SCHEDULE & GOALS
 // ================================================================
 function renderSchedule() {
   const list = document.getElementById('scheduleList');
@@ -1524,7 +1544,7 @@ function confirmNewSchedule() {
   renderSchedule();
   closeModal('newScheduleModal');
   logActivity('reminder', 'Kazi imeongezwa: '+task);
-  speak('Sawa, nimeongeza kazi: '+task+'. Nitakukumbusha.');
+  speak('Sawa, nimeongeza kazi: '+task);
   showToast('✅ Kazi imeongezwa!', 'ok');
   updateReminderBadge();
 }
@@ -1561,7 +1581,7 @@ function renderGoals() {
         <button class="btn ${g.done?'btn-ghost':'btn-green'} btn-sm" onclick="toggleGoalDone('${g.id}')">${g.done?'Tengua':'Kamilisha'}</button>
       </div>
       <div class="goal-meta">Tarehe: ${g.deadline?new Date(g.deadline).toLocaleDateString('en-GB'):'Hakuna'} · Siku: ${Math.floor((Date.now()-new Date(g.createdISO).getTime())/86400000)}</div>
-      ${!g.done ? `<div style="font-size:10px;color:var(--text-faint);"><i class="fa-solid fa-bell"></i> Ukumbusho: ${g.reminderFreq==='daily'?'Kila siku':'Kila wiki'}</div>` : ''}
+      ${!g.done ? `<div style="font-size:10px;color:var(--text-faint);"><i class="fa-solid fa-bell"></i> ${g.reminderFreq==='daily'?'Kila siku':'Kila wiki'}</div>` : ''}
     </div>
   `).join('');
 }
@@ -1576,7 +1596,7 @@ function confirmNewGoal() {
   renderGoals();
   closeModal('newGoalModal');
   logActivity('reminder', 'Lengo jipya: '+name);
-  speak('Nimehifadhi lengo lako: '+name+'. Nitakukumbusha.');
+  speak('Nimehifadhi lengo lako: '+name);
   showToast('🎯 Lengo limeongezwa!', 'ok');
   updateReminderBadge();
 }
@@ -1603,14 +1623,13 @@ function checkReminders() {
   const reminderLog = getReminderLog();
   let hasReminder = false;
 
-  // Schedule reminders - every 15 min
   const undoneTasks = state.schedule.filter(s=>s.dateKey===today && !s.done);
   undoneTasks.forEach(item => {
     const key = 'sched_' + item.id + '_' + today;
     const lastRemind = reminderLog[key] ? new Date(reminderLog[key]) : null;
     if (!lastRemind || (now - lastRemind) > 15 * 60 * 1000) {
       const timeMsg = item.time ? ` iliyopangwa saa ${item.time}` : '';
-      speak('Kumbuka: ' + item.task + timeMsg + '. Bado hujakamilisha.');
+      speak('Kumbuka: ' + item.task + timeMsg);
       logActivity('reminder', 'Kukumbusha: ' + item.task);
       reminderLog[key] = nowISO();
       setReminderLog(reminderLog);
@@ -1619,7 +1638,6 @@ function checkReminders() {
     }
   });
 
-  // Goals reminders
   state.goals.filter(g=>!g.done).forEach(g => {
     const key = 'goal_' + g.id + '_' + today;
     const lastRemind = reminderLog[key] ? new Date(reminderLog[key]) : null;
@@ -1636,16 +1654,15 @@ function checkReminders() {
     }
   });
 
-  // Savings reminder
   if (getTodaySavings() === 0) {
     const key = 'savings_' + today;
     const lastRemind = reminderLog[key] ? new Date(reminderLog[key]) : null;
     if (!lastRemind || (now - lastRemind) > 4 * 60 * 60 * 1000) {
-      speak('Bwana, leo hujatiki akiba. Tafadhali weka akiba.');
+      speak('Leo hujatiki akiba. Weka akiba.');
       reminderLog[key] = nowISO();
       setReminderLog(reminderLog);
       hasReminder = true;
-      showReminderAlarm('💰 Hakuna akiba leo', 'Kumbukumbu');
+      showReminderAlarm('💰 Hakuna akiba leo', '');
     }
   }
 
@@ -1710,8 +1727,8 @@ function toggleLiveMic() {
     
     const conv = getConversation();
     if (conv.length > 0) {
-      showToast('🎤 Mazungumzo ' + conv.length + ' yamekamilika! AI inachambua...', 'gold');
-      speak('Mazungumzo yamekamilika. AI inachambua mauzo yako.');
+      showToast('🎤 Mazungumzo '+conv.length+' yamekamilika! AI inachambua...', 'gold');
+      speak('Mazungumzo yamekamilika. AI inachambua...');
       setTimeout(() => processWithAI(), 1500);
     } else {
       showToast('Hakuna mazungumzo yaliyorekodiwa', 'warn');
@@ -1724,7 +1741,6 @@ function toggleLiveMic() {
     liveRecognition.continuous = true;
     liveRecognition.interimResults = true;
     liveRecognition.lang = 'sw-TZ';
-    liveRecognition.continuous = true;
     
     liveRecognition.onresult = function(e) {
       let finalText = '';
@@ -1758,7 +1774,7 @@ function toggleLiveMic() {
     if (pageLabel) pageLabel.textContent = '🔴 Zima Mic';
     document.getElementById('liveMicStatus').textContent = '🟢 Inarekodi...';
     document.getElementById('liveMicStatus').style.color = 'var(--green)';
-    document.getElementById('orbStatus').textContent = '🎤 Inarekodi mazungumzo yote...';
+    document.getElementById('orbStatus').textContent = '🎤 Inarekodi...';
     document.getElementById('orbStatus').className = 'orb-status live';
     document.getElementById('liveTranscript').style.display = 'block';
     
@@ -1832,7 +1848,7 @@ function renderConversation() {
         <div class="meta">
           <span class="time">${time}</span>
           ${tag}
-          ${c.processed ? '<span class="tag" style="background:var(--green-soft);color:var(--green);padding:1px 8px;border-radius:999px;font-size:9px;">✅ Imechakuliwa</span>' : '<span class="tag" style="background:var(--gold-soft);color:var(--gold);padding:1px 8px;border-radius:999px;font-size:9px;">⏳ Inasubiri</span>'}
+          ${c.processed ? '<span class="tag" style="background:var(--green-soft);color:var(--green);padding:1px 8px;border-radius:999px;font-size:9px;">✅</span>' : '<span class="tag" style="background:var(--gold-soft);color:var(--gold);padding:1px 8px;border-radius:999px;font-size:9px;">⏳</span>'}
         </div>
       </div>
     `;
@@ -1877,7 +1893,7 @@ async function processWithAI() {
   
   modal.style.display = 'flex';
   modal.classList.add('open');
-  content.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);">🧠 AI inachambua mazungumzo yako...</div>';
+  content.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);">🧠 AI inachambua...</div>';
   
   try {
     const fullText = conv.map(c => c.text).join(' ');
@@ -1907,7 +1923,6 @@ async function processWithAI() {
       JIBU KWA KISWAHILI.
     `);
     
-    // Parse response
     let salesItems = [];
     let expenseItems = [];
     let totals = { sales: 0, expenses: 0 };
@@ -1953,6 +1968,9 @@ async function processWithAI() {
     let html = `
       <div style="margin-bottom:14px;font-size:13px;color:var(--text-dim);">
         <i class="fa-solid fa-info-circle"></i> AI imetambua mauzo ${salesItems.length} na matumizi ${expenseItems.length}
+        <div style="margin-top:6px;font-weight:600;color:var(--gold);">
+          🏷️ Jumla ya Mauzo: Tsh ${fmtMoney(totals.sales)} | Jumla ya Matumizi: Tsh ${fmtMoney(totals.expenses)} | Faida: Tsh ${fmtMoney(totals.sales - totals.expenses)}
+        </div>
       </div>
       <div style="max-height:400px;overflow-y:auto;">
     `;
@@ -1962,7 +1980,6 @@ async function processWithAI() {
         <div class="receipt-empty">
           <i class="fa-solid fa-search" style="font-size:30px;display:block;margin-bottom:10px;"></i>
           Hakuna mauzo au matumizi yaliyotambuliwa.
-          Hakikisha umetaja "uza", "seli", "matumizi", au "tumia".
         </div>
       `;
     }
@@ -1989,9 +2006,6 @@ async function processWithAI() {
               <option value="unpaid">Haijalipiwa</option>
             </select>
           </div>
-          <div style="font-size:11px;color:var(--text-faint);margin-top:4px;">
-            Jumla: Tsh ${fmtMoney(s.total)}
-          </div>
         </div>
       `;
     });
@@ -2009,8 +2023,7 @@ async function processWithAI() {
       `;
     });
     
-    window._aiSalesData = salesItems;
-    window._aiExpenseData = expenseItems;
+    aiDetectedItems = { sales: salesItems, expenses: expenseItems, totals: totals };
     
     html += '</div>';
     content.innerHTML = html;
@@ -2027,8 +2040,8 @@ async function processWithAI() {
 }
 
 function confirmAIResults() {
-  const salesData = window._aiSalesData || [];
-  const expenseData = window._aiExpenseData || [];
+  const salesData = aiDetectedItems.sales || [];
+  const expenseData = aiDetectedItems.expenses || [];
   
   let processedSales = 0;
   let processedExpenses = 0;
@@ -2067,7 +2080,7 @@ function confirmAIResults() {
         const price2 = parseInt(document.getElementById('quickStockPrice').value)||price;
         if(!name) { showToast('Andika jina la bidhaa', 'warn'); return; }
         if(state.stocks[name]) { state.stocks[name].idadi += qty2; if(price2>0) state.stocks[name].bei = price2; }
-        else { state.stocks[name] = {idadi:qty2, bei:price2}; }
+        else { state.stocks[name] = {idadi:qty2, bei:price2, added: todayKey()}; }
         saveState();
         renderStockTable();
         renderStats();
@@ -2134,21 +2147,14 @@ function confirmAIResults() {
     showToast('✅ Mauzo ' + processedSales + ' na Matumizi ' + processedExpenses + ' yamekamilika!', 'gold');
     speak('Mauzo ' + processedSales + ' na matumizi ' + processedExpenses + ' yamekamilika.');
   }
+  
+  aiDetectedItems = {};
 }
 
 function checkAllDone() {
-  const salesData = window._aiSalesData || [];
-  let allDone = true;
-  salesData.forEach((_, idx) => {
-    const select = document.getElementById('aiSaleProduct_' + idx);
-    if (select && (!select.value || select.value === '')) {
-      allDone = false;
-    }
-  });
-  if (allDone && salesData.length > 0) {
-    closeModal('aiProcessModal');
-    showToast('🎉 Mauzo yote yamekamilika!', 'gold');
-  }
+  // Check if all processed
+  closeModal('aiProcessModal');
+  showToast('🎉 Mauzo yote yamekamilika!', 'gold');
 }
 
 // ================================================================
@@ -2210,6 +2216,14 @@ function renderFinalReport() {
   const openTime = state.shopOpenTime ? new Date(state.shopOpenTime).toLocaleTimeString('en-GB') : '--:--';
   const closeTime = state.shopCloseTime ? new Date(state.shopCloseTime).toLocaleTimeString('en-GB') : '--:--';
   
+  // AI Audit - detect issues
+  let auditIssues = [];
+  if (profit < 0) auditIssues.push('⚠️ Biashara imepata hasara leo.');
+  if (expenses > sales * 0.8) auditIssues.push('⚠️ Matumizi yako ni makubwa. Angalia gharama.');
+  if (unpaid > 0) auditIssues.push('💳 Kuna madeni '+unpaid+' ya wateja.');
+  if (undoneTasks > 3) auditIssues.push('📋 Una kazi '+undoneTasks+' zilizobaki.');
+  if (savings === 0) auditIssues.push('💰 Hakuna akiba leo. Weka akiba!');
+  
   container.innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px;">
       <div class="data-item" style="background:var(--panel-2);border-radius:10px;padding:14px;text-align:center;">
@@ -2270,6 +2284,17 @@ function renderFinalReport() {
         ${undoneTasks > 0 ? `📋 Una kazi ${undoneTasks} zilizobaki.` : '✅ Kazi zote zimekamilika!'}
         ${unpaid > 0 ? `💳 Kuna madeni ${unpaid} ya wateja.` : ''}
       </div>
+      ${auditIssues.length > 0 ? `
+        <div style="margin-top:10px;padding:10px;background:var(--red-soft);border-radius:8px;border-left:3px solid var(--red);">
+          <div style="font-weight:600;color:var(--red);font-size:12px;">🔍 AI AUDIT</div>
+          ${auditIssues.map(issue => `<div style="font-size:12px;color:var(--text-dim);margin-top:2px;">${issue}</div>`).join('')}
+        </div>
+      ` : `
+        <div style="margin-top:10px;padding:10px;background:var(--green-soft);border-radius:8px;border-left:3px solid var(--green);">
+          <div style="font-weight:600;color:var(--green);font-size:12px;">✅ AI AUDIT</div>
+          <div style="font-size:12px;color:var(--text-dim);">Hakuna matatizo yaliyogunduliwa. Biashara inaendelea vizuri!</div>
+        </div>
+      `}
     </div>
   `;
 }
@@ -2323,104 +2348,151 @@ function speakFinalReport() {
 // ================================================================
 // VOICE COMMANDS
 // ================================================================
-function triggerVoiceSale() {
-  voiceFlowActive = true;
-  voiceFlowStep = 'sale_customer';
-  voiceFlowData = {};
-  speak('Tafadhali sema jina la mteja.');
-}
-
-function triggerVoiceExpense() {
-  voiceFlowActive = true;
-  voiceFlowStep = 'expense_desc';
-  voiceFlowData = {};
-  speak('Ni kitu gani unatumia?');
-}
-
 function processVoiceCommand(text) {
   const lower = text.toLowerCase();
   if(voiceFlowActive) { handleVoiceFlow(text); return; }
 
-  if(/\b(seli|mauzo|sales|sell)\b/.test(lower)) { triggerVoiceSale(); return; }
-  if(/\b(matumizi|expense|tumia|gharama)\b/.test(lower)) { triggerVoiceExpense(); return; }
-  if(/\b(akiba|savings|save|weka akiba)\b/.test(lower)) { triggerSavings(); return; }
-  if(/\b(ratiba|schedule|kazi|to do)\b/.test(lower)) { showPage('malengo'); speak('Ukurasa wa ratiba na malengo.'); return; }
+  // Quick sale detection
+  const saleMatch = lower.match(/(?:uza|seli|niliuza|nimeuza)\s*(\d+)/i);
+  if (saleMatch) {
+    const amount = parseInt(saleMatch[1]);
+    if (amount > 0) {
+      // Try to find product from context
+      const productMatch = lower.match(/(?:uza|seli|niliuza|nimeuza)\s*\d+\s*(?:za\s*)?([a-z]+)/i);
+      const productName = productMatch ? productMatch[1] : 'bidhaa';
+      
+      // Check if product exists in stock
+      let foundProduct = null;
+      for (const key of Object.keys(state.stocks)) {
+        if (key.includes(productName) || productName.includes(key)) {
+          foundProduct = key;
+          break;
+        }
+      }
+      
+      if (foundProduct) {
+        const price = state.stocks[foundProduct].bei;
+        const qty = Math.max(1, Math.floor(amount / price));
+        if (state.stocks[foundProduct].idadi >= qty) {
+          const sale = recordSale([{name: foundProduct, qty, price}], 'Mteja wa Sauti', 'paid');
+          speak('Nimeuza '+foundProduct+' '+qty+' kwa Tsh '+fmtMoney(amount));
+          viewReceipt(sale.id);
+          return;
+        } else {
+          speak('Stoki ya '+foundProduct+' haitoshi.');
+          return;
+        }
+      } else {
+        // New product - add to stock
+        speak('Bidhaa '+productName+' haipo stoki. Nitaiongeza.');
+        if (state.stocks[productName]) {
+          state.stocks[productName].idadi += 1;
+        } else {
+          state.stocks[productName] = {idadi: 1, bei: Math.round(amount / 2), added: todayKey()};
+        }
+        saveState();
+        renderStockTable();
+        const sale = recordSale([{name: productName, qty: 1, price: Math.round(amount)}], 'Mteja wa Sauti', 'paid');
+        speak('Nimeongeza '+productName+' stoki na nimeuza 1 kwa Tsh '+fmtMoney(amount));
+        viewReceipt(sale.id);
+        return;
+      }
+    }
+  }
 
-  for(const key of Object.keys(state.stocks)) {
-    if(lower.includes(key)) {
-      const s=state.stocks[key];
-      speak('Una '+key+' '+s.idadi+', bei Tsh '+fmtMoney(s.bei));
+  // Quick expense detection
+  const expenseMatch = lower.match(/(?:matumizi|tumia|nilitumia|nimetumia)\s*(\d+)\s*(?:ya\s*)?([a-z]+)/i);
+  if (expenseMatch) {
+    const amount = parseInt(expenseMatch[1]);
+    const desc = expenseMatch[2] || 'gharama';
+    if (amount > 0) {
+      state.expenses.push({id:uid(), dateISO:nowISO(), desc, amount});
+      saveState();
+      renderExpenseTable();
+      renderStats();
+      speak('Nimeongeza matumizi ya '+desc+' Tsh '+fmtMoney(amount));
+      showToast('💸 Matumizi yamehifadhiwa', 'ok');
       return;
     }
   }
-  speak('Samahani, sijaelewa. Ongea chochote, Live Mic inarekodi.');
+
+  if(/\b(akiba|savings|save|weka akiba)\b/.test(lower)) { triggerSavings(); return; }
+  if(/\b(ratiba|schedule|kazi|to do)\b/.test(lower)) { showPage('malengo'); speak('Ukurasa wa ratiba na malengo.'); return; }
+  if(/\b(ripoti|report|summary)\b/.test(lower)) { showPage('alldata'); speak('Ripoti ya siku.'); return; }
+
+  speak('Samahani, sijaelewa. Sema "Uza 5000" au "Matumizi 3000 ya chumvi"');
 }
 
 function handleVoiceFlow(text) {
-  if(voiceFlowStep==='sale_customer') {
-    voiceFlowData.customer = text.trim();
-    voiceFlowStep = 'sale_item';
-    speak('Sema bidhaa unayouza.');
-    return;
-  }
-  if(voiceFlowStep==='sale_item') {
-    const item = findClosestStockItem(text);
-    if(!item) { speak('Sijapata bidhaa hiyo.'); voiceFlowActive=false; return; }
-    voiceFlowData.item = item;
-    voiceFlowStep = 'sale_qty';
-    speak('Una '+state.stocks[item].idadi+' za '+item+'. Sema idadi.');
-    return;
-  }
-  if(voiceFlowStep==='sale_qty') {
-    const qty = extractNumber(text);
-    if(!qty || qty<1) { speak('Tafadhali sema idadi sahihi.'); return; }
-    const item=voiceFlowData.item;
-    if(state.stocks[item].idadi<qty) { speak('Stoki ya '+item+' ina '+state.stocks[item].idadi+' tu.'); voiceFlowActive=false; return; }
-    const sale = recordSale([{name:item, qty, price:state.stocks[item].bei}], voiceFlowData.customer||'', 'paid');
-    speak('Sawa, nimeuza '+item+' '+qty+', jumla Tsh '+fmtMoney(sale.total));
-    viewReceipt(sale.id);
-    voiceFlowActive=false;
-    return;
-  }
-  if(voiceFlowStep==='expense_desc') {
-    voiceFlowData.desc = text.trim();
-    voiceFlowStep = 'expense_amount';
-    speak('Sema kiasi cha matumizi.');
-    return;
-  }
-  if(voiceFlowStep==='expense_amount') {
-    const amount = extractNumber(text);
-    if(!amount || amount<1) { speak('Tafadhali sema kiasi sahihi.'); return; }
-    state.expenses.push({id:uid(), dateISO:nowISO(), desc:voiceFlowData.desc, amount});
-    saveState();
-    renderAll();
-    speak('Nimeongeza matumizi ya '+voiceFlowData.desc+', Tsh '+fmtMoney(amount));
-    voiceFlowActive=false;
-    return;
-  }
-  voiceFlowActive=false;
-  speak('Samahani, sijaelewa.');
-}
-
-function findClosestStockItem(name) {
-  if(!name) return null;
-  name=name.trim().toLowerCase();
-  if(state.stocks[name]) return name;
-  const keys = Object.keys(state.stocks);
-  let best=null, bestScore=0;
-  for(const k of keys) {
-    if(k.includes(name) || name.includes(k)) {
-      const score=Math.min(k.length, name.length);
-      if(score>bestScore) { best=k; bestScore=score; }
+  if(voiceFlowStep==='quick_sale') {
+    const match = text.match(/(\d+)/);
+    if (match) {
+      const amount = parseInt(match[1]);
+      speak('Nimeelewa uza '+fmtMoney(amount)+'. Tafadhali sema bidhaa.');
+      voiceFlowData.amount = amount;
+      voiceFlowStep = 'quick_sale_product';
+    } else {
+      speak('Samahani, sijaelewa kiasi. Jaribu tena.');
     }
+    return;
   }
-  return best;
-}
-
-function extractNumber(text) {
-  const m=text.match(/\d+/);
-  if(m) return parseInt(m[0]);
-  return null;
+  if(voiceFlowStep==='quick_sale_product') {
+    const product = text.trim().toLowerCase();
+    voiceFlowData.product = product;
+    // Process sale
+    const amount = voiceFlowData.amount;
+    let foundProduct = null;
+    for (const key of Object.keys(state.stocks)) {
+      if (key.includes(product) || product.includes(key)) {
+        foundProduct = key;
+        break;
+      }
+    }
+    if (foundProduct) {
+      const price = state.stocks[foundProduct].bei;
+      const qty = Math.max(1, Math.floor(amount / price));
+      if (state.stocks[foundProduct].idadi >= qty) {
+        const sale = recordSale([{name: foundProduct, qty, price}], 'Mteja wa Sauti', 'paid');
+        speak('Nimeuza '+foundProduct+' '+qty+' kwa Tsh '+fmtMoney(amount));
+        viewReceipt(sale.id);
+      } else {
+        speak('Stoki ya '+foundProduct+' haitoshi.');
+      }
+    } else {
+      speak('Bidhaa '+product+' haipo stoki. Nitaiongeza.');
+      if (state.stocks[product]) {
+        state.stocks[product].idadi += 1;
+      } else {
+        state.stocks[product] = {idadi: 1, bei: Math.round(amount / 2), added: todayKey()};
+      }
+      saveState();
+      renderStockTable();
+      const sale = recordSale([{name: product, qty: 1, price: Math.round(amount)}], 'Mteja wa Sauti', 'paid');
+      speak('Nimeongeza '+product+' stoki na nimeuza 1 kwa Tsh '+fmtMoney(amount));
+      viewReceipt(sale.id);
+    }
+    voiceFlowActive = false;
+    return;
+  }
+  if(voiceFlowStep==='quick_expense') {
+    const match = text.match(/(\d+)\s*(?:ya\s*)?([a-z]+)/i);
+    if (match) {
+      const amount = parseInt(match[1]);
+      const desc = match[2] || 'gharama';
+      state.expenses.push({id:uid(), dateISO:nowISO(), desc, amount});
+      saveState();
+      renderExpenseTable();
+      renderStats();
+      speak('Nimeongeza matumizi ya '+desc+' Tsh '+fmtMoney(amount));
+      showToast('💸 Matumizi yamehifadhiwa', 'ok');
+      voiceFlowActive = false;
+    } else {
+      speak('Samahani, sijaelewa. Sema "Matumizi 3000 ya chumvi"');
+    }
+    return;
+  }
+  voiceFlowActive = false;
+  speak('Samahani, sijaelewa.');
 }
 
 // ================================================================
@@ -2517,6 +2589,29 @@ function submitTypedCommand() {
 }
 
 // ================================================================
+// DOWNLOAD APP
+// ================================================================
+function downloadApp() {
+  try {
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob(['<!DOCTYPE html>\n' + html], {
+      type: 'text/html;charset=utf-8'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jawiza-app-' + todayKey() + '.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✅ App imepakuwa!', 'ok');
+  } catch(e) {
+    showToast('❌ Hitilafu: ' + e.message, 'warn');
+  }
+}
+
+// ================================================================
 // RENDER ALL
 // ================================================================
 function renderAll() {
@@ -2535,11 +2630,7 @@ function renderAll() {
 }
 
 function renderReminderAlarm() {
-  // Just show the container
-  const container = document.getElementById('reminderAlarmContainer');
-  if (container) {
-    // Keep existing alarms
-  }
+  // Container exists
 }
 
 // ================================================================
@@ -2570,7 +2661,6 @@ function init() {
     m.style.display = 'none';
   });
   
-  // Start reminder checker every 30 seconds
   setInterval(checkReminders, 30000);
   setTimeout(checkReminders, 5000);
   
